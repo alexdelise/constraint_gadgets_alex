@@ -1,5 +1,6 @@
 import subprocess
 import os
+import make_data
 
 # Configuration
 results_path = "C:/Users/alexr/OneDrive/QAO-REU/constraint_gadgets_alex/alex/"
@@ -40,6 +41,9 @@ if run_single:
 # Multiple Constraint
 if run_two:
     print("Running for two constraints")
+    print("--- Generating Constraint Data Files ---")
+    data_path = os.path.join(results_path, "results/")
+    make_data.make_two_constraints(result_dir=data_path)
     for support in [1, 2, 3]:
         print(f"--- Generating Gadgets: support={support} ---")
         subprocess.run([
