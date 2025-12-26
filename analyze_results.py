@@ -56,7 +56,7 @@ def calculate_probability_optimal_qubo(counts: dict, optimal_x: list | None, n_c
     return tot_prob / total_counts
 
 
-def read_single_constraint_data(corp: str = '', results_dir: str = './results/') -> pd.DataFrame:
+def read_single_constraint_data(corp: str = '', results_dir: str = './alex/results/') -> pd.DataFrame:
     """
     Read the single constraint data from the results directory.
     Args:
@@ -68,14 +68,16 @@ def read_single_constraint_data(corp: str = '', results_dir: str = './results/')
     df = pd.DataFrame()
     for op in ops:
         if corp == '':
-            temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_data_{op}.pkl')
+            #temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_data_{op}.pkl')
+            temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_{op}.pkl')
             temp_df['problem'] = op
             temp_df['prob_opt'] = temp_df.apply(lambda x: calculate_probability_optimal(x['counts'], x['outcomes']), axis=1)
             temp_df['depth'] = temp_df['resources'].apply(lambda x: x.depth)
             temp_df['num_gates'] = temp_df['resources'].apply(lambda x: x.num_gates)
             temp_df['num_gates_2'] = temp_df['resources'].apply(lambda x: x.gate_sizes[2])
         elif corp == 'qubo_':
-            temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_data_{op}_3.pkl')
+            temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_{op}_1.pkl')
+            # temp_df = pd.read_pickle(f'{results_dir}{corp}single_constraint_{op}_{}.pkl')
             temp_df['problem'] = op
             temp_df['constraints'] = temp_df['constraints'].apply(lambda x: [x])
             temp_df['prob_opt'] = temp_df.apply(lambda x: calculate_probability_optimal_qubo(x['counts'], x['optimal_x']), axis=1)
@@ -116,14 +118,16 @@ def plot_single_constraint_ar(df: pd.DataFrame, problem: str, hue='b', qubo: boo
         None
     """
     ops = {'equals': '=', 'geq': r'$\geq$', 'leq': r'$\leq$', 'less': '<', 'greater': '>'}
-    plots_dir = './plots/'
+    plots_dir = 'alex/plots/'
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
     if moon:
         plt.style.use('rose-pine-moon')
         colors = ['C0', 'C4', 'C2', 'C1', 'C3', 'C5']
     else:
-        plt.style.use('rose-pine-dawn')
+        #plt.style.use('rose-pine-dawn')
+        #colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
+        plt.style.use("default")
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
     dff = df.copy()
     dff = dff[dff['problem'] == problem]
@@ -185,7 +189,7 @@ def plot_single_constraint_ar(df: pd.DataFrame, problem: str, hue='b', qubo: boo
                 plt.savefig(f'{plots_dir}{problem}_qubo_AR_dawn.png', facecolor='white')
             else:
                 plt.savefig(f'{plots_dir}{problem}_AR_dawn.png', facecolor='white')
-        plt.show()
+        #plt.show()
         plt.close()
 
 
@@ -205,14 +209,16 @@ def plot_single_constraint_prob_opt(df: pd.DataFrame, problem: str, hue='b', qub
         None
     """
     ops = {'equals': '=', 'geq': r'$\geq$', 'leq': r'$\leq$', 'less': '<', 'greater': '>'}
-    plots_dir = './plots/'
+    plots_dir = 'alex/plots/'
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
     if moon:
         plt.style.use('rose-pine-moon')
         colors = ['C0', 'C4', 'C2', 'C1', 'C3', 'C5']
     else:
-        plt.style.use('rose-pine-dawn')
+        #plt.style.use('rose-pine-dawn')
+        #colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
+        plt.style.use("default")
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
     dff = df.copy()
     dff = dff[dff['problem'] == problem]
@@ -241,7 +247,7 @@ def plot_single_constraint_prob_opt(df: pd.DataFrame, problem: str, hue='b', qub
                 plt.savefig(f'{plots_dir}{problem}_qubo_prob_opt_vs_n_x_moon.png')
             else:
                 plt.savefig(f'{plots_dir}{problem}_prob_opt_vs_n_x_moon.png')
-        plt.show()
+        #plt.show()
         plt.close()
     else:
         plt.background = 'white'
@@ -281,7 +287,7 @@ def plot_single_constraint_prob_opt(df: pd.DataFrame, problem: str, hue='b', qub
             else:
                 plt.savefig(f'{plots_dir}{problem}_prob_opt_vs_n_x_dawn.png', facecolor='white')
 
-        plt.show()
+        #plt.show()
         plt.close()
 
 
@@ -299,7 +305,7 @@ def plot_single_constraint_counts(df: pd.DataFrame, constraint: list[str], probl
     Returns:
         None
     """
-    plots_dir = './plots/'
+    plots_dir = 'alex/plots/'
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
     if moon:
@@ -307,9 +313,10 @@ def plot_single_constraint_counts(df: pd.DataFrame, constraint: list[str], probl
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
         outcome_color = 'C1'
     else:
-        plt.style.use('rose-pine-dawn')
+        #plt.style.use('rose-pine-dawn')
+        #colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
+        plt.style.use("default")
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
-        #
     dff = df.copy()
     dff = dff[dff['constraints'].map(tuple) == tuple(constraint)]
     outcomes = dff['outcomes'].iloc[0]
@@ -353,7 +360,7 @@ def plot_single_constraint_counts(df: pd.DataFrame, constraint: list[str], probl
         plt.tight_layout()
         if save:
             plt.savefig(f'{plots_dir}{problem}_prob_opt_vs_n_x_moon.png')
-        plt.show()
+        #plt.show()
         plt.close()
     else:
         plt.xlabel('States: ' + r'$|'+' '.join([f'x_{i}' for i in range(dff["n_x"].iloc[0])]) + ' '.join([f'v_{i}' for i in range(dff['n_c'].iloc[0])]) + r' \rangle$', size=18)
@@ -384,7 +391,7 @@ def plot_single_constraint_counts(df: pd.DataFrame, constraint: list[str], probl
                 plt.savefig(f'{plots_dir}alex_constr_vs_{df[df["constraints"].map(tuple) == tuple(constraint)].index[0]}_counts_dawn.png', facecolor='white')
             else:
                 plt.savefig(f'{plots_dir}alex_qubo_vs_{df[df["constraints"].map(tuple) == tuple(constraint)].index[0]}_counts_dawn.png', facecolor='white')
-        plt.show()
+        #plt.show()
         plt.close()
 
 
@@ -402,7 +409,7 @@ Two Constraint Data
 #|%%--%%| <O4Et9M9NAy|qOL3rDxKxP>
 
 
-def read_two_constraint_data(corp: str = '', results_dir: str = './results/') -> pd.DataFrame:
+def read_two_constraint_data(corp: str = '', results_dir: str = './alex/results/') -> pd.DataFrame:
     """
     Read the two constraint data from the results directory.
     This data is for n_layers = 1 of the GM-QAOA circuit.
@@ -430,7 +437,7 @@ def read_two_constraint_data(corp: str = '', results_dir: str = './results/') ->
     return df
 
 
-def read_two_constraint_data_2(corp='qubo_', results_dir: str = './results/') -> pd.DataFrame:
+def read_two_constraint_data_2(corp='qubo_', results_dir: str = './alex/results/') -> pd.DataFrame:
     """
     Read the two constraint data from the results directory.
     This data is for n_layers = 2 of the GM-QAOA circuit.
@@ -487,7 +494,7 @@ def plot_two_constraint_prob_opt(df: pd.DataFrame, hue='single_flag', qubo: bool
     Returns:
         None
     """
-    plots_dir = './plots/'
+    plots_dir = 'alex/plots/'
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
     if moon:
@@ -532,7 +539,7 @@ def plot_two_constraint_prob_opt(df: pd.DataFrame, hue='single_flag', qubo: bool
                 plt.savefig(f'{plots_dir}{hue}_qubo_prob_opt_vs_n_x_moon.png')
             else:
                 plt.savefig(f'{plots_dir}{hue}_prob_opt_vs_n_x_moon.png')
-        plt.show()
+        #plt.show()
         plt.close()
     else:
         plt.background = 'white'
@@ -573,7 +580,7 @@ def plot_two_constraint_prob_opt(df: pd.DataFrame, hue='single_flag', qubo: bool
             else:
                 plt.savefig(f'{plots_dir}two_constr_vs_support_prob_opt_dawn.png', facecolor='white')
 
-        plt.show()
+        #plt.show()
         plt.close()
 
 
@@ -591,15 +598,19 @@ def plot_two_constraint_ar(df: pd.DataFrame, hue='single_flag', qubo: bool = Fal
     Returns:
         None
     """
-    plots_dir = './plots/'
+    plots_dir = 'alex/plots/'
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
     if moon:
         plt.style.use('rose-pine-moon')
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
     else:
-        plt.style.use('rose-pine-dawn')
+        #plt.style.use('rose-pine-dawn')
+        #colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
+        plt.style.use("default")
         colors = ['C0', 'C5', 'C2', 'C1', 'C3', 'C4']
+
+        
     dff = df.copy()
     dff[hue] = dff[hue].astype(str)
     dff['constraints'] = dff['constraints'].map(tuple)
@@ -677,7 +688,7 @@ def plot_two_constraint_ar(df: pd.DataFrame, hue='single_flag', qubo: bool = Fal
             else:
                 plt.savefig(f'{plots_dir}two_constr_vs_support_AR_dawn.png', facecolor='white')
 
-        plt.show()
+        #plt.show()
         plt.close()
 
 
@@ -695,7 +706,7 @@ Hamiltonian LaTeX Table
 state_hams_eq = state_df[(state_df['problem'] == 'equals') & (state_df['angle_strategy'] == 'ma-QAOA')][['constraints', 'Hamiltonian']]
 
 
-def write_hamiltonian_latex_table(df, file_name, results_dir='./results/'):
+def write_hamiltonian_latex_table(df, file_name, results_dir='./alex/results/'):
     with open(f'{results_dir}{file_name}', 'w') as f:
         f.write('\\begin{tabular}{|c|l|}\n')
         f.write('\\hline\n')

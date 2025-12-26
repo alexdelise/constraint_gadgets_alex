@@ -1,7 +1,8 @@
 import pennylane as qml
 from pennylane import numpy as np
 import pandas as pd
-import constraint_qaoa_server as cq
+#import constraint_qaoa_server as cq
+import constraint_qaoa as cq
 import problem_qaoa as pq
 import make_data as data
 import argparse
@@ -85,11 +86,11 @@ def collect_pqaoa_data(pqaoa: pq.ProblemQAOA, qubo_string: str, cqaoa: cq.Constr
     if pqaoa.n_layers == 1:
         opt_cost, opt_angles = pqaoa.optimize_angles(pqaoa.do_evolution_circuit)
     elif pqaoa.n_layers == 2:
-        previous_df = pd.read_pickle(f'./results/qubo_two_constraint_support_{support}_single_{single_flag}.pkl')
+        previous_df = pd.read_pickle(f'alex/results/qubo_two_constraint_support_{support}_single_{single_flag}.pkl')
         previous_angles = np.array(previous_df[(previous_df['qubo_string'] == qubo_string) & (previous_df['constraints'].map(tuple) == tuple(cqaoa.constraints)) & (previous_df['angle_strategy'] == cqaoa.angle_strategy)]['opt_angles'].values[0])
         opt_cost, opt_angles = pqaoa.optimize_angles(pqaoa.do_evolution_circuit, prev_layer_angles=previous_angles)
     else:
-        previous_df = pd.read_pickle(f'./results/qubo_two_constraint_support_{support}_single_{single_flag}_n_layers_{pqaoa.n_layers-1}.pkl')
+        previous_df = pd.read_pickle(f'alex/results/qubo_two_constraint_support_{support}_single_{single_flag}_n_layers_{pqaoa.n_layers-1}.pkl')
         previous_angles = np.array(previous_df[(previous_df['qubo_string'] == qubo_string) & (previous_df['constraints'].map(tuple) == tuple(cqaoa.constraints)) & (previous_df['angle_strategy'] == cqaoa.angle_strategy)]['opt_angles'].values[0])
         opt_cost, opt_angles = pqaoa.optimize_angles(pqaoa.do_evolution_circuit, prev_layer_angles=previous_angles)
 
@@ -141,7 +142,7 @@ Functions to run ConstraintQAOA and ProblemQAOA for a range of constraints and c
 #|%%--%%| <QzKeZMU5aC|WNJGvQ0iTO>
 
 
-def run_cqaoa(support: int, result_dir: str = './results/', result_file: str = 'two_constraint', combined: bool = False, single_flag: bool = False, decompose: bool = True) -> None:
+def run_cqaoa(support: int, result_dir: str = 'alex/results/', result_file: str = 'two_constraint', combined: bool = False, single_flag: bool = False, decompose: bool = True) -> None:
     """
     Run ConstraintQAOA for a set of constraints and collect results.
     Args:
@@ -182,7 +183,7 @@ def run_cqaoa(support: int, result_dir: str = './results/', result_file: str = '
             df.to_pickle(f'{result_dir}{result_file}.pkl')
 
 
-def run_pqaoa(support: int, result_dir: str = './results/', constraint_result_file: str = 'two_constraint', result_file: str = 'qubo_two_constraint', combined: bool = False, overlap: bool = False, single_flag: bool = False, decompose: bool = True, n_layers: int = 1) -> None:
+def run_pqaoa(support: int, result_dir: str = 'alex/results/', constraint_result_file: str = 'two_constraint', result_file: str = 'qubo_two_constraint', combined: bool = False, overlap: bool = False, single_flag: bool = False, decompose: bool = True, n_layers: int = 1) -> None:
     """
     Run ProblemQAOA for a set of QCBOs and constraints, using ConstraintQAOA for state preparation, and collect results.
     Args:
@@ -254,7 +255,7 @@ Main function to run either CQAOA or PQAOA based on command line arguments.
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the server code.')
-    parser.add_argument('--results_dir', type=str, default='./results/', help='Directory to save results')
+    parser.add_argument('--results_dir', type=str, default='alex/results/', help='Directory to save results')
     parser.add_argument('--corp', type=str, default='constraint', help='Whether to make the constraint gadget or solve the qubo problem')
     parser.add_argument('--support', type=int, default=1, help='Support of the constraints (1, 2, or 3)')
     parser.add_argument('--single_flag', action='store_true', help='Use single flag qubit for constraints')
@@ -262,9 +263,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.corp == 'constraint':
-        run_cqaoa(args.support, result_dir='./results/', result_file=f'two_constraint_support_{args.support}_single_{args.single_flag}', combined=False, single_flag=args.single_flag, decompose=True)
+        run_cqaoa(args.support, result_dir='alex/results/', result_file=f'two_constraint_support_{args.support}_single_{args.single_flag}', combined=False, single_flag=args.single_flag, decompose=True)
     elif args.corp == 'problem':
-        run_pqaoa(args.support, result_dir='./results/', constraint_result_file=f'two_constraint_support_{args.support}_single_{args.single_flag}', result_file=f'qubo_two_constraint_support_{args.support}_single_{args.single_flag}_n_layers_{args.n_layers}', combined=False, overlap=False, single_flag=args.single_flag, decompose=True, n_layers=args.n_layers)
+        run_pqaoa(args.support, result_dir='alex/results/', constraint_result_file=f'two_constraint_support_{args.support}_single_{args.single_flag}', result_file=f'qubo_two_constraint_support_{args.support}_single_{args.single_flag}_n_layers_{args.n_layers}', combined=False, overlap=False, single_flag=args.single_flag, decompose=True, n_layers=args.n_layers)
     else:
         raise ValueError('Invalid value for --corp. Must be "constraint" or "problem".')
 
